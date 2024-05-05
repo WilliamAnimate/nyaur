@@ -1,6 +1,12 @@
 use std::path::Path;
 use std::fs::remove_dir_all;
 
+macro_rules! get_pkgbuild_path {
+    ($nyaur_path:expr, $pkg:expr) => {
+        format!("{}/{}/PKGBUILD", $nyaur_path, $pkg)
+    }
+}
+
 pub fn clean_nyaur_working_dir(nyaur_path: &str) -> Result<(), std::io::Error> {
     if let Err(err) = remove_dir_all(nyaur_path) {
         return Err(err); // 💀
@@ -9,11 +15,25 @@ pub fn clean_nyaur_working_dir(nyaur_path: &str) -> Result<(), std::io::Error> {
     Ok(())
 }
 
+pub fn show_pkgbuild(nyaur_path: String, pkg: &str) -> Result<(), std::io::Error> {
+    use std::process::Command;
+
+    let pkgbuild = get_pkgbuild_path!(nyaur_path, pkg);
+    let less = Command::new("less")
+        .arg(pkgbuild)
+        .spawn();
+
+    let _ = less?.wait();
+
+    Ok(())
+}
+
 pub fn pkg_has_pkgbuild(nyaur_path: String, pkg: &str) -> Result<bool, std::io::Error> {
-    let fmt = format!("{nyaur_path}/{pkg}/PKGBUILD");
+    let fmt = get_pkgbuild_path!(nyaur_path, pkg);
     if Path::new(&fmt).exists() {
         return Ok(true);
     }
+
     Ok(false)
 }
 

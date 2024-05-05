@@ -1,8 +1,8 @@
 //! This is a very poorly written AUR helper in rust.
 //! Would one ever want to use this? of course not!
 
-#[cfg(not(feature = "let_me_compile"))]
-compile_error!("Repeat after me: DO NOT use this as your daily AUR helper.\nI have forbidden you from doing so, in the readme.\nIn case you **REALLY, REALLY** want to do so, run:\ncargo b --features let_me_compile");
+// #[cfg(not(feature = "let_me_compile"))]
+// compile_error!("Repeat after me: DO NOT use this as your daily AUR helper.\nI have forbidden you from doing so, in the readme.\nIn case you **REALLY, REALLY** want to do so, run:\ncargo b --features let_me_compile");
 
 mod args;
 mod filesystem;
@@ -156,6 +156,34 @@ fn main() -> std::io::Result<()> {
         }
     }
 
+    let home_dir = HOME_DIR.lock().unwrap();
+
+    // this is rediculous; can't we just put this in one for loop?
+    // this is where we lessify the makepkg lmao
+    // if you have 500 aur packages then you're gonna be hitting `q` a lotta times
+    for pkg in &aur_packages {
+        use std::io;
+
+        if let Err(err) = filesystem::show_pkgbuild(home_dir.to_string(), pkg) {
+            eprintln!("mastew, i can't show uuu the pkgbuild for {pkg}! thisw is the ewwow: {err}");
+        }
+
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("Failed to read line");
+        let trimmed_input = input.trim();
+        match trimmed_input {
+            "y" | "Y" | "" => (),
+            "n" | "N" => {
+                println!("okay mastew, baiwing out");
+                return Ok(())
+            }
+            _ => {
+                println!("me confused meowmeow. assuming nyo");
+                return Ok(())
+            },
+        }
+    }
+
     // makepkg phase
     for pkg in &aur_packages {
         match fs_makepkg(pkg) {
@@ -165,7 +193,6 @@ fn main() -> std::io::Result<()> {
     }
 
     // then install remaining pacman pkgs
-    dbg!(&aur_packages);
     for pkg in &aur_packages {
         use nyaur::pacman::invoke_pacman;
 
