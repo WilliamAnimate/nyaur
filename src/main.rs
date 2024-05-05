@@ -1,8 +1,8 @@
 //! This is a very poorly written AUR helper in rust.
 //! Would one ever want to use this? of course not!
 
-// #[cfg(not(feature = "let_me_compile"))]
-// compile_error!("Repeat after me: DO NOT use this as your daily AUR helper.\nI have forbidden you from doing so, in the readme.\nIn case you **REALLY, REALLY** want to do so, run:\ncargo b --features let_me_compile");
+#[cfg(not(feature = "let_me_compile"))]
+compile_error!("Repeat after me: DO NOT use this as your daily AUR helper.\nI have forbidden you from doing so, in the readme.\nIn case you **REALLY, REALLY** want to do so, run:\ncargo b --features let_me_compile");
 
 mod args;
 mod filesystem;
